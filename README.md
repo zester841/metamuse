@@ -52,6 +52,11 @@ python -m spacy download en_core_web_md
 python -m nltk.downloader stopwords
 ```
 
+#### (Optional) generate your own pdf using this command. It will be generated in the output folder
+```
+python pdf.py
+```
+
 ### 4. Run the app
 ```
 streamlit run app.py

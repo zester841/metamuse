@@ -11,8 +11,16 @@ try:
 except:
     nltk.download('stopwords')
 
-# Load models
-nlp = spacy.load("en_core_web_md")
+# Load spaCy model with direct import
+try:
+    import en_core_web_md
+    nlp = en_core_web_md.load()
+except ImportError:
+    # Fallback for local environments
+    from spacy.cli import download
+    download("en_core_web_md")
+    import en_core_web_md
+    nlp = en_core_web_md.load()
 kw_model = KeyBERT()
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
@@ -111,7 +119,7 @@ def generate_summary(text):
         return "Document too short for meaningful summary"
     
     # Use first 1024 tokens for summarization
-    inputs = text[:3000]
+    inputs = text[:4100]
     return summarizer(inputs, max_length=150, min_length=30)[0]['summary_text']
 
 def generate_metadata(text):
