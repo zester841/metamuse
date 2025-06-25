@@ -12,16 +12,17 @@
 - JSON metadata export
 
 ## Installation
-```git clone https://github.com/yourusername/metamind.git
+```
+git clone https://github.com/yourusername/metamind.git
 cd metamind
-pip install -r requirements.txt```
-
+pip install -r requirements.txt
 
 ## Running the App
+```
 streamlit run app.py
 
-
 ## Docker Deployment
+```
 docker build -t metamind .
 docker run -p 8501:8501 metamind
 
