@@ -1,17 +1,36 @@
 # MetaMuse: Automated Metadata Generation System
 
-## Features
-- Extracts text from PDF, DOCX, and TXT (with OCR fallback for PDFs)
-- Generates semantic metadata:
-  - Keyphrases
-  - Named entities
-  - Abstractive summary
-  - Sentiment & readability analysis
-  - Document statistics
-- Clean, modern Streamlit web interface
-- Downloadable JSON metadata
+![Metadata Extraction Demo](https://via.placeholder.com/800x400?text=Demo+GIF+or+Screenshot)
+
+MetaMuse is an AI-powered document processing system that automatically extracts rich semantic metadata from documents. It transforms unstructured content into structured insights with advanced NLP and OCR capabilities.
+
+## ✨ Key Features
+
+- **Multi-format Support**  
+  Process PDF (including scanned), DOCX, and TXT files
+- **Semantic Metadata Extraction**:
+  - Keyphrase identification
+  - Named entity recognition
+  - Abstractive summarization
+  - Sentiment analysis
+  - Readability classification
+- **Smart Document Insights**:
+  - Word/sentence statistics
+  - Content categorization
+  - Author/title detection
+- **User-Friendly Interface**:
+  - Modern web-based UI (Streamlit)
+  - Real-time processing indicators
+  - JSON metadata export
 
 ## Installation
+
+### Prerequisites
+- Python 3.9+
+- Tesseract OCR (`sudo apt install tesseract-ocr poppler-utils` on Ubuntu)
+- [Download spaCy model](https://spacy.io/models/en#en_core_web_md):  
+  `python -m spacy download en_core_web_md`
+
 ### 1. Clone the repository
 
 ```
@@ -30,11 +49,8 @@ source .venv/bin/activate # On Windows: .venv\Scripts\activate
 ```
 pip install -r requirements.txt
 python -m spacy download en_core_web_md
+python -m nltk.downloader stopwords
 ```
-
-**Install system dependencies:**
-- Ubuntu: `sudo apt-get install tesseract-ocr poppler-utils`
-- Windows: Download [Tesseract](https://github.com/tesseract-ocr/tesseract) and [Poppler](http://blog.alivate.com.au/poppler-windows/) binaries and add to PATH.
 
 ### 4. Run the app
 ```

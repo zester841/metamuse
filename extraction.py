@@ -1,38 +1,41 @@
-import os
-from pdfminer.high_level import extract_text as pdf_extract_text
-from pdf2image import convert_from_path
+import io
 import pytesseract
-from docx import Document
+import pdfplumber
+import docx
+import fitz  # PyMuPDF
+from pdf2image import convert_from_bytes
+from PIL import Image
 
-def extract_text_from_pdf(file_path):
+def extract_pdf_text(file):
+    """Extract text from PDF with layout analysis and OCR fallback"""
+    content = file.read()
+    
+    # Try text extraction first
     try:
-        text = pdf_extract_text(file_path)
-        if text.strip():
-            return text
-    except Exception:
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
+            text = "\n".join(page.extract_text() for page in pdf.pages)
+            if text.strip(): return text
+    except:
         pass
-    # Fallback to OCR if no text extracted
-    images = convert_from_path(file_path)
-    text = ""
-    for img in images:
-        text += pytesseract.image_to_string(img)
-    return text
+    
+    # OCR fallback
+    images = convert_from_bytes(content)
+    return "\n".join(pytesseract.image_to_string(img) for img in images)
 
-def extract_text_from_docx(file_path):
-    doc = Document(file_path)
-    return "\n".join([para.text for para in doc.paragraphs])
+def extract_docx_text(file):
+    """Extract text from DOCX files"""
+    doc = docx.Document(io.BytesIO(file.read()))
+    return "\n".join(para.text for para in doc.paragraphs)
 
-def extract_text_from_txt(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
-
-def extract_content(file_path: str) -> str:
-    ext = os.path.splitext(file_path)[-1].lower()
-    if ext == ".pdf":
-        return extract_text_from_pdf(file_path)
-    elif ext == ".docx":
-        return extract_text_from_docx(file_path)
-    elif ext == ".txt":
-        return extract_text_from_txt(file_path)
+def extract_content(file):
+    """Main extraction function"""
+    filename = file.name.lower()
+    
+    if filename.endswith('.pdf'):
+        return extract_pdf_text(file)
+    elif filename.endswith('.docx'):
+        return extract_docx_text(file)
+    elif filename.endswith('.txt'):
+        return file.read().decode('utf-8')
     else:
-        raise ValueError("Unsupported file format.")
+        raise ValueError("Unsupported file format")
