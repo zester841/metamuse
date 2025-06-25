@@ -64,7 +64,8 @@ streamlit run app.py
 
 ## Usage
 1. Open your browser at [http://localhost:8501](http://localhost:8501)
-2. Upload your document and view/download the generated metadata.
+2. Upload your document or upload from the "sample documents" directory and view/download the generated metadata.
+3. you can also generate and upload your own pdf by running "python pdf.py"
 
 ## Docker (optional)
 docker build -t metamind .

@@ -36,43 +36,39 @@ TOPIC_MAP = {
 }
 
 def extract_title(text):
-    """Improved title extraction with section detection"""
+    """Extract document title using heuristic rules"""
+    # First non-empty line
     lines = [line.strip() for line in text.split('\n') if line.strip()]
-    # Prioritize lines before abstract/introduction
-    for i, line in enumerate(lines):
-        if "abstract" in line.lower() or "introduction" in line.lower():
-            if i > 0 and 10 <= len(lines[i-1]) <= 120:
-                return lines[i-1]
-    # Fallback to first meaningful line
-    for line in lines:
-        if 10 <= len(line) <= 120 and not line.isupper():
-            return line
+    if lines:
+        candidate = lines[0]
+        if 10 <= len(candidate) <= 120 and not candidate.isupper():
+            return candidate
+    
+    # First sentence
+    first_sentence = text.split('.')[0]
+    if 20 <= len(first_sentence) <= 150:
+        return first_sentence
+    
     return "Untitled Document"
 
 def extract_author(text):
-    """Enhanced author extraction with multiple heuristics"""
-    # Try author line pattern (Name - Title/affiliation)
-    author_pattern = r'^([A-Z][a-z]+(?:\s[A-Z][a-z]*)+)\s*-\s*[A-Za-z\s]+$'
     lines = text.split('\n')
-    for line in lines[:20]:  # Check first 20 lines
-        match = re.match(author_pattern, line)
+    author_regex = r"^([A-Z][a-zA-Z\.\'\s]+)\s*-\s*[A-Za-z\s]+$"
+    for line in lines[:30]:  # Check first 30 lines for safety
+        match = re.match(author_regex, line.strip())
         if match:
             return match.group(1).strip()
-    
-    # NER with context filtering
-    doc = nlp(text[:3000])
+    # Fallback: "By" line
+    match = re.search(r"(?i)^by\s+([A-Z][a-zA-Z\.\'\s]+)$", text, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
+    # Fallback: NER
+    import spacy
+    nlp = spacy.load("en_core_web_md")
+    doc = nlp(text[:2000])
     persons = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
     if persons:
-        # Filter out common non-author names
-        author_candidates = [p for p in persons if not any(word in p.lower() for word in ['university', 'department', 'institute'])]
-        if author_candidates:
-            return author_candidates[0]
-    
-    # "By" pattern detection
-    match = re.search(r"(?i)(?:by|author|written by)[: ]+\s*([\w\s\.\-']+)", text[:2000])
-    if match:
-        return match.group(1).strip().title()
-    
+        return persons[0]
     return "Unknown Author"
 
 def extract_date(text):
