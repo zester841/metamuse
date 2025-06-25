@@ -1,35 +1,50 @@
-# MetaMind - Automated Metadata Generator
+# MetaMuse: Automated Metadata Generation System
 
 ## Features
-- Extracts text from PDF, DOCX, and TXT documents
-- Uses OCR for image-based PDFs
-- Generates semantic metadata including:
+- Extracts text from PDF, DOCX, and TXT (with OCR fallback for PDFs)
+- Generates semantic metadata:
   - Keyphrases
   - Named entities
-  - Document summary
-  - Readability metrics
-- Web interface for document upload
-- JSON metadata export
+  - Abstractive summary
+  - Sentiment & readability analysis
+  - Document statistics
+- Clean, modern Streamlit web interface
+- Downloadable JSON metadata
 
 ## Installation
+### 1. Clone the repository
+
 ```
 git clone https://github.com/yourusername/metamind.git
 cd metamind
-pip install -r requirements.txt
 ```
 
-## Running the App
+### 2. Set up a virtual environment
+```
+python3 -m venv .venv
+source .venv/bin/activate # On Windows: .venv\Scripts\activate
+```
+
+
+### 3. Install dependencies
+```
+pip install -r requirements.txt
+python -m spacy download en_core_web_md
+```
+
+**Install system dependencies:**
+- Ubuntu: `sudo apt-get install tesseract-ocr poppler-utils`
+- Windows: Download [Tesseract](https://github.com/tesseract-ocr/tesseract) and [Poppler](http://blog.alivate.com.au/poppler-windows/) binaries and add to PATH.
+
+### 4. Run the app
 ```
 streamlit run app.py
 ```
 
-## Docker Deployment
-```
+## Usage
+1. Open your browser at [http://localhost:8501](http://localhost:8501)
+2. Upload your document and view/download the generated metadata.
+
+## Docker (optional)
 docker build -t metamind .
 docker run -p 8501:8501 metamind
-```
-
-## Usage
-1. Access the web interface at `http://localhost:8501`
-2. Upload a document (PDF, DOCX, or TXT)
-3. View and download generated metadata

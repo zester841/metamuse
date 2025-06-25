@@ -1,32 +1,38 @@
+import os
+from pdfminer.high_level import extract_text as pdf_extract_text
+from pdf2image import convert_from_path
 import pytesseract
-from pdfminer.high_level import extract_text
-from pdf2image import convert_from_bytes
 from docx import Document
-import io
 
-def extract_content(file_path):
-    # Determine file type
-    if file_path.endswith('.pdf'):
-        try:
-            # First try standard text extraction
-            return extract_text(file_path)
-        except:
-            # Fallback to OCR for image-based PDFs
-            with open(file_path, 'rb') as f:
-                images = convert_from_bytes(f.read())
-            full_text = ""
-            for image in images:
-                text = pytesseract.image_to_string(image)
-                full_text += text + "\n"
-            return full_text
-    
-    elif file_path.endswith('.docx'):
-        doc = Document(file_path)
-        return "\n".join([para.text for para in doc.paragraphs])
-    
-    elif file_path.endswith('.txt'):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    
+def extract_text_from_pdf(file_path):
+    try:
+        text = pdf_extract_text(file_path)
+        if text.strip():
+            return text
+    except Exception:
+        pass
+    # Fallback to OCR if no text extracted
+    images = convert_from_path(file_path)
+    text = ""
+    for img in images:
+        text += pytesseract.image_to_string(img)
+    return text
+
+def extract_text_from_docx(file_path):
+    doc = Document(file_path)
+    return "\n".join([para.text for para in doc.paragraphs])
+
+def extract_text_from_txt(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+def extract_content(file_path: str) -> str:
+    ext = os.path.splitext(file_path)[-1].lower()
+    if ext == ".pdf":
+        return extract_text_from_pdf(file_path)
+    elif ext == ".docx":
+        return extract_text_from_docx(file_path)
+    elif ext == ".txt":
+        return extract_text_from_txt(file_path)
     else:
-        raise ValueError("Unsupported file format")
+        raise ValueError("Unsupported file format.")
